@@ -22,7 +22,10 @@ RUN npm install -g agent-browser @rabbitai-lab/agent-browser-mcp \
     && agent-browser install --with-deps \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/
 
-# 4. 创建非 root 用户和 workspace
+# 4. 复制看门狗脚本
+COPY --chmod=a+rx watchdog.sh /usr/local/bin/watchdog.sh
+
+# 5. 创建非 root 用户和 workspace
 RUN groupadd -r sandbox && useradd -r -g sandbox -G audio,video -s /bin/bash sandbox \
     && mkdir -p /home/sandbox /workspace \
     && chown -R sandbox:sandbox /home/sandbox /workspace
@@ -37,4 +40,4 @@ EXPOSE 12345 9222 12346 12347
 WORKDIR /workspace
 USER sandbox
 
-CMD ["bash"]
+CMD ["/bin/bash", "-c", "watchdog.sh & exec bash"]
