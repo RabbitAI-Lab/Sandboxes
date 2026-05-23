@@ -40,4 +40,4 @@ EXPOSE 12345 9222 12346 12347
 WORKDIR /workspace
 USER sandbox
 
-CMD ["/bin/bash", "-c", "watchdog.sh & exec bash"]
+CMD ["watchdog.sh"]
