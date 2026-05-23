@@ -21,16 +21,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Detect changed images
         id: detect
         run: |
-          if github.event_name == 'workflow_dispatch'; then
-            echo "images=claude-code" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            images=$(ls -d */ | sed 's/\///' | tr '\n' ' ')
           else
-            changed=$(git diff --name-only HEAD~1 HEAD | grep -oP '^[^/]+(?=/)' | sort -u | grep -v '.github')
-            echo "images=$changed" >> $GITHUB_OUTPUT
+            if [ "$(git rev-list --count HEAD)" -lt 2 ]; then
+              images=$(ls -d */ | sed 's/\///' | tr '\n' ' ')
+            else
+              images=$(git diff --name-only HEAD~1 HEAD | grep -oP '^[^/]+(?=/)' | sort -u | grep -v '.github' | tr '\n' ' ')
+            fi
           fi
+          echo "images=$images" >> $GITHUB_OUTPUT
 
       - name: Log in to Container Registry
         if: steps.detect.outputs.images != ''
