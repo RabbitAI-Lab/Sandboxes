@@ -10,7 +10,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -23,26 +22,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect changed images
+        id: detect
+        run: |
+          if github.event_name == 'workflow_dispatch'; then
+            echo "images=claude-code" >> $GITHUB_OUTPUT
+          else
+            changed=$(git diff --name-only HEAD~1 HEAD | grep -oP '^[^/]+(?=/)' | sort -u | grep -v '.github')
+            echo "images=$changed" >> $GITHUB_OUTPUT
+          fi
+
       - name: Log in to Container Registry
+        if: steps.detect.outputs.images != ''
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix=
-
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: claude-code
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push images
+        if: steps.detect.outputs.images != ''
+        run: |
+          for image in ${{ steps.detect.outputs.images }}; do
+            echo "::group::Building $image"
+            IMAGE_TAG="${{ env.REGISTRY }}/${{ github.repository_owner }}/${image}:latest"
+            SHA_TAG="${{ env.REGISTRY }}/${{ github.repository_owner }}/${image}:sha-${GITHUB_SHA:0:7}"
+            docker build -t "$IMAGE_TAG" -t "$SHA_TAG" "$image"
+            docker push "$IMAGE_TAG"
+            docker push "$SHA_TAG"
+            echo "::endgroup::"
+          done
