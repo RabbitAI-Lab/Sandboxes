@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  agent-browser:
+    image: ghcr.io/rabbitai-lab/agent-browser:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    container_name: agent-browser
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "12345:12345"  # Dashboard Web UI
+      - "9222:9222"    # Chrome DevTools Protocol (CDP)
+      - "12346:12346"  # WebSocket Streaming
+      - "12347:12347"  # MCP Server
+    volumes:
+      - workspace:/workspace
+    environment:
+      - DISPLAY=:99
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+          cpus: "0.5"
+    shm_size: "1g"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:12345 && curl -sf http://localhost:12347 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+volumes:
+  workspace:
+    driver: local

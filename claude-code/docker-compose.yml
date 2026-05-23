@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  claude-code:
+    image: ghcr.io/rabbitai-lab/claude-code:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claude-code
+    restart: unless-stopped
+    volumes:
+      - workspace:/workspace
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+volumes:
+  workspace:
+    driver: local

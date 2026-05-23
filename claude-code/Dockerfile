@@ -27,7 +27,7 @@ RUN curl -fsSL https://claude.ai/install.sh | bash
 # 4. 创建非 root 用户和 workspace 目录（遵循 OpenSandbox 约定）
 RUN groupadd -r sandbox && useradd -r -g sandbox -s /bin/bash sandbox \
     && mkdir -p /home/sandbox /workspace \
-    && cp -r /root/.local /home/sandbox/.local \
+    && cp -rL /root/.local /home/sandbox/.local \
     && chown -R sandbox:sandbox /home/sandbox /workspace
 
 # 工作目录
@@ -42,4 +42,4 @@ USER sandbox
 ENV PATH="/home/sandbox/.local/bin:${PATH}"
 
 # 默认入口
-CMD ["bash"]
+CMD ["tail", "-f", "/dev/null"]
