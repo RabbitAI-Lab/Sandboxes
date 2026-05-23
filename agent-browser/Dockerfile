@@ -28,10 +28,10 @@ RUN groupadd -r sandbox && useradd -r -g sandbox -G audio,video -s /bin/bash san
     && chown -R sandbox:sandbox /home/sandbox /workspace
 
 # 暴露端口
-# 4848 - Dashboard Web UI
+# 12345 - Dashboard Web UI (启动命令: agent-browser dashboard start --port 12345)
 # 9222 - Chrome DevTools Protocol (CDP)
 # 9223 - WebSocket Streaming
-EXPOSE 4848 9222 9223
+EXPOSE 12345 9222 9223
 
 WORKDIR /workspace
 USER sandbox
