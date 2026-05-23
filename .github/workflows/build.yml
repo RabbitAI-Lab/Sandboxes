@@ -51,8 +51,9 @@ jobs:
         run: |
           for image in ${{ steps.detect.outputs.images }}; do
             echo "::group::Building $image"
-            IMAGE_TAG="${{ env.REGISTRY }}/${{ github.repository_owner }}/${image}:latest"
-            SHA_TAG="${{ env.REGISTRY }}/${{ github.repository_owner }}/${image}:sha-${GITHUB_SHA:0:7}"
+            OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            IMAGE_TAG="${{ env.REGISTRY }}/${OWNER}/${image}:latest"
+            SHA_TAG="${{ env.REGISTRY }}/${OWNER}/${image}:sha-${GITHUB_SHA:0:7}"
             docker build -t "$IMAGE_TAG" -t "$SHA_TAG" "$image"
             docker push "$IMAGE_TAG"
             docker push "$SHA_TAG"
