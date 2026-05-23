@@ -17,8 +17,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/
 
-# 3. 安装 agent-browser 并下载 Chrome
-RUN npm install -g agent-browser \
+# 3. 安装 agent-browser、Chrome 及 MCP Server
+RUN npm install -g agent-browser @rabbitai-lab/agent-browser-mcp \
     && agent-browser install --with-deps \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/
 
@@ -31,7 +31,8 @@ RUN groupadd -r sandbox && useradd -r -g sandbox -G audio,video -s /bin/bash san
 # 12345 - Dashboard Web UI (启动命令: agent-browser dashboard start --port 12345)
 # 9222 - Chrome DevTools Protocol (CDP)
 # 12346 - WebSocket Streaming (启动命令: agent-browser stream enable --port 12346)
-EXPOSE 12345 9222 12346
+# 12347 - MCP Server (启动命令: agent-browser-mcp --port 12347)
+EXPOSE 12345 9222 12346 12347
 
 WORKDIR /workspace
 USER sandbox
