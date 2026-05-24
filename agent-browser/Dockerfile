@@ -66,6 +66,10 @@ RUN groupadd -r sandbox && useradd -r -g sandbox -G audio,video -s /bin/bash san
 # 5. 复制看门狗脚本
 COPY --chmod=a+rx watchdog.sh /usr/local/bin/watchdog.sh
 
+# 6. OpenSandbox bootstrap.sh 会读取 BOOTSTRAP_CMD 环境变量并优先执行
+# K8s command 会覆盖镜像 CMD，但 ENV 仍然保留在容器内
+ENV BOOTSTRAP_CMD="watchdog.sh & tail -f /dev/null"
+
 # 暴露端口
 # 12345 - Dashboard Web UI (内部端口 4848, socat 转发到 0.0.0.0:12345)
 # 9222 - Chrome DevTools Protocol (CDP)
