@@ -38,6 +38,43 @@ from opensandbox import Sandbox
 sandbox = await Sandbox.create("ghcr.io/rabbitai-lab/claude-code:latest")
 ```
 
+## 本地调试
+
+进入镜像对应的目录，通过 docker compose 构建并运行。
+
+> **注意**: 镜像基于 `linux/amd64` 构建，ARM64 Mac 用户需要使用 QEMU 模拟。首次构建较慢，请耐心等待。
+
+```bash
+# Claude Code 沙箱
+cd claude-code
+# 从本地 Dockerfile 构建镜像
+docker compose build
+
+# 构建并启动（首次推荐）
+docker compose up -d --build
+
+# 仅启动（已有镜像）
+docker compose up -d
+
+# 进入 Claude Code
+docker exec -it claude-code claude
+```
+
+Claude Code 镜像启动后会自动拉起 sandbox-agent daemon（端口 2468）和看门狗。
+
+```bash
+# Agent Browser 沙箱
+cd agent-browser
+
+# 构建
+docker compose build
+
+# 启动
+docker compose up -d
+```
+
+> **注意**: 运行 Claude Code 时需要设置环境变量 `ANTHROPIC_API_KEY`，可在 `docker compose up` 前 export 或在 `.env` 文件中配置。
+
 ## 仓库结构
 
 ```

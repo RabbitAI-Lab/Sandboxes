@@ -6,7 +6,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
     container_name: claude-code
+    ports:
+      - "2468:2468"
     restart: unless-stopped
     volumes:
       - workspace:/workspace
@@ -20,6 +24,12 @@ services:
         reservations:
           memory: 256M
           cpus: "0.25"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:2468 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     logging:
       driver: json-file
       options:
