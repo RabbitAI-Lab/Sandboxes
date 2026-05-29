@@ -1,0 +1,9 @@
+.git
+.github
+.mcp.json
+docker-compose.yml
+watchdog.sh
+cors-proxy.sh
+nginx.conf
+*.md
+LICENSE
