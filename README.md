@@ -8,6 +8,7 @@ RabbitAI Lab 的沙箱镜像集合。每个子目录对应一个独立的 Docker
 |------|------|------|
 | `ghcr.io/rabbitai-lab/claude-code` | `claude-code/` | 基于 Ubuntu 24.04，包含 Claude Code CLI、Node.js 22 LTS、常用开发工具 |
 | `ghcr.io/rabbitai-lab/agent-browser` | `agent-browser/` | 基于 Ubuntu 24.04，包含 agent-browser CLI + Chromium（用于 AI Agent 浏览器自动化） |
+| `ghcr.io/rabbitai-lab/dev-box` | `dev-box/` | 基于 Ubuntu 24.04 的通用开发环境：Node.js 24、pnpm、PM2、Claude Code、Python 3、JDK 8/21/26、Maven、Gradle 8.10/9.6.1、Nginx、GitHub CLI、browser-use CLI |
 
 ## 使用方式
 
@@ -26,6 +27,12 @@ docker run -it --rm \
   -p 12345:12345 \
   ghcr.io/rabbitai-lab/agent-browser:latest \
   agent-browser dashboard start --port 12345
+
+# 运行 Dev Box 沙箱（交互式 shell）
+docker run -it --rm \
+  -p 3000:3000 -p 8000:8000 -p 8080:8080 \
+  ghcr.io/rabbitai-lab/dev-box:latest \
+  /bin/bash
 ```
 
 ### 在 OpenSandbox 中使用
@@ -81,10 +88,13 @@ docker compose up -d
 Sandboxes/
 ├── .github/workflows/
 │   ├── build-claude-code.yml       # Claude Code 独立构建 workflow
-│   └── build-agent-browser.yml     # Agent Browser 独立构建 workflow
+│   ├── build-agent-browser.yml     # Agent Browser 独立构建 workflow
+│   └── build-dev-box.yml           # Dev Box 独立构建 workflow
 ├── claude-code/
 │   └── Dockerfile
 ├── agent-browser/
+│   └── Dockerfile
+├── dev-box/
 │   └── Dockerfile
 ├── .gitignore
 └── README.md
@@ -96,6 +106,7 @@ Sandboxes/
 
 - 修改 `claude-code/**` → 仅触发 `build-claude-code.yml`
 - 修改 `agent-browser/**` → 仅触发 `build-agent-browser.yml`
+- 修改 `dev-box/**` → 仅触发 `build-dev-box.yml`
 - 打 tag（如 `v0.1`）→ 所有镜像都会构建，附带版本号标签
 
 每个镜像会自动打上以下标签：

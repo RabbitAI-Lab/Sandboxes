@@ -1,0 +1,36 @@
+services:
+  dev-box:
+    image: ghcr.io/rabbitai-lab/dev-box:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    container_name: dev-box
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "3000:3000"  # 常用前端/Node 服务端口
+      - "8000:8000"  # 常用后端服务端口
+      - "8080:8080"  # 常用 Java/Web 服务端口
+    volumes:
+      - workspace:/workspace
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
+        reservations:
+          memory: 1G
+          cpus: "0.5"
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+volumes:
+  workspace:
+    driver: local
